@@ -3,7 +3,7 @@ import { useState } from "react";
 import { signup, signin } from "../api/api";
 
 export default function AuthPage({ onLogin }) {
-  const [mode, setMode]       = useState("signup"); // "signup" | "signin"
+  const [mode, setMode]       = useState("signup");
   const [form, setForm]       = useState({ name:"", email:"", password:"", confirm:"" });
   const [error, setError]     = useState("");
   const [success, setSuccess] = useState("");
@@ -41,64 +41,55 @@ export default function AuthPage({ onLogin }) {
     }
   }
 
+  // Allow Enter key to submit
+  function handleKey(e) {
+    if (e.key === "Enter") handleSubmit();
+  }
+
   return (
-    <div style={S.page}>
-      <div style={S.card}>
-        {/* Header */}
-        <div style={S.header}>
-          <div style={S.dot}>◆</div>
-          <h1 style={S.h1}>{mode === "signup" ? "Create Account" : "Welcome Back"}</h1>
-          <p style={S.sub}>{mode === "signup" ? "Sign up once. Come back anytime." : "Sign in with your credentials."}</p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+          <span className="auth-logo">◆</span>
+          <h1 className="auth-title">{mode === "signup" ? "Create Account" : "Welcome Back"}</h1>
+          <p className="auth-sub">{mode === "signup" ? "Sign up once. Come back anytime." : "Sign in with your credentials."}</p>
         </div>
 
-        {/* Fields */}
-        {mode === "signup" && <Field label="Full Name"    value={form.name}     onChange={set("name")}    placeholder="Your full name" />}
-        <Field label="Email Address" value={form.email}    onChange={set("email")}    placeholder="you@example.com" type="email" />
-        <Field label="Password"      value={form.password} onChange={set("password")} placeholder="At least 6 characters" type="password" />
-        {mode === "signup" && <Field label="Confirm Password" value={form.confirm} onChange={set("confirm")} placeholder="Repeat your password" type="password" />}
+        {mode === "signup" && (
+          <div className="form-group">
+            <label className="form-label">Full Name</label>
+            <input className="form-input" type="text" value={form.name} onChange={set("name")} onKeyDown={handleKey} placeholder="Your full name" autoComplete="name"/>
+          </div>
+        )}
+        <div className="form-group">
+          <label className="form-label">Email Address</label>
+          <input className="form-input" type="email" value={form.email} onChange={set("email")} onKeyDown={handleKey} placeholder="you@example.com" autoComplete="email"/>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Password</label>
+          <input className="form-input" type="password" value={form.password} onChange={set("password")} onKeyDown={handleKey} placeholder="At least 6 characters" autoComplete={mode === "signup" ? "new-password" : "current-password"}/>
+        </div>
+        {mode === "signup" && (
+          <div className="form-group">
+            <label className="form-label">Confirm Password</label>
+            <input className="form-input" type="password" value={form.confirm} onChange={set("confirm")} onKeyDown={handleKey} placeholder="Repeat your password" autoComplete="new-password"/>
+          </div>
+        )}
 
-        {/* Messages */}
-        {error   && <p style={S.error}>{error}</p>}
-        {success && <p style={S.success}>{success}</p>}
+        {error   && <p className="msg-error">{error}</p>}
+        {success && <p className="msg-success">{success}</p>}
 
-        {/* Submit */}
-        <button style={S.btn} onClick={handleSubmit} disabled={loading}>
+        <button className="btn-primary" onClick={handleSubmit} disabled={loading}>
           {loading ? "Please wait…" : mode === "signup" ? "Create Account" : "Sign In"}
         </button>
 
-        {/* Switch */}
-        <p style={S.switchText}>
+        <p className="switch-text">
           {mode === "signup" ? "Already have an account? " : "Don't have an account? "}
-          <span style={S.link} onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setError(""); setSuccess(""); }}>
+          <button className="switch-link" onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setError(""); setSuccess(""); }}>
             {mode === "signup" ? "Sign In" : "Sign Up"}
-          </span>
+          </button>
         </p>
       </div>
     </div>
   );
 }
-
-function Field({ label, value, onChange, placeholder, type = "text" }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <label style={S.label}>{label}</label>
-      <input style={S.input} type={type} value={value} onChange={onChange} placeholder={placeholder} />
-    </div>
-  );
-}
-
-const S = {
-  page:       { minHeight:"100vh", background:"#0f0f11", display:"flex", alignItems:"center", justifyContent:"center", padding:24, fontFamily:"'DM Sans',sans-serif" },
-  card:       { background:"#1a1a1f", border:"1px solid #2e2e38", borderRadius:14, padding:"40px 36px", width:"100%", maxWidth:440, boxShadow:"0 24px 64px rgba(0,0,0,0.5)" },
-  header:     { textAlign:"center", marginBottom:28 },
-  dot:        { color:"#c8f261", fontSize:26, marginBottom:10 },
-  h1:         { fontFamily:"'DM Serif Display',serif", fontSize:"2rem", fontWeight:400, color:"#f0f0f0", margin:"0 0 6px" },
-  sub:        { color:"#888899", fontSize:"0.94rem", margin:0 },
-  label:      { display:"block", fontSize:"0.8rem", fontWeight:600, color:"#888899", textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:6 },
-  input:      { width:"100%", background:"#0f0f11", border:"1px solid #2e2e38", borderRadius:8, padding:"12px 15px", color:"#f0f0f0", fontSize:"0.96rem", outline:"none", boxSizing:"border-box", fontFamily:"inherit" },
-  btn:        { width:"100%", background:"#c8f261", color:"#0f0f11", border:"none", borderRadius:8, padding:14, fontFamily:"inherit", fontSize:"0.97rem", fontWeight:700, cursor:"pointer", marginTop:8, marginBottom:18 },
-  switchText: { textAlign:"center", fontSize:"0.88rem", color:"#888899", margin:0 },
-  link:       { color:"#c8f261", cursor:"pointer", fontWeight:600 },
-  error:      { color:"#ff6b6b", fontSize:"0.88rem", marginBottom:10 },
-  success:    { color:"#c8f261", fontSize:"0.88rem", marginBottom:10 },
-};
