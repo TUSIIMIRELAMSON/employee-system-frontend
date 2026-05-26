@@ -4,11 +4,11 @@ import DataForm       from "../components/DataForm";
 import RecentRecords  from "../components/RecentRecords";
 import ReportsPage    from "./ReportsPage";
 import {
-  addEmployee,     getEmployees,
-  addDepartment,   getDepartments,
-  addDeptManager,  getDeptManager,
-  addDeptEmployee, getDeptEmployees,
-  addSalary,       getSalaries,
+  addEmployee,     getEmployees,    deleteEmployee,    updateEmployee,
+  addDepartment,   getDepartments,  deleteDepartment,  updateDepartment,
+  addDeptManager,  getDeptManager,  deleteDeptManager,
+  addDeptEmployee, getDeptEmployees,deleteDeptEmployee,
+  addSalary,       getSalaries,     deleteSalary,      updateSalary,
 } from "../api/api";
 
 const TABS = [
@@ -24,6 +24,9 @@ export default function DashboardPage({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState("reports");
   const [records, setRecords]     = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [editModal, setEditModal]   = useState(null); // { table, row }
+  const [editForm,  setEditForm]    = useState({});
 
   const fetchAll = useCallback(async () => {
     const [emp, dep, dm, de, sal] = await Promise.allSettled([
@@ -44,6 +47,41 @@ export default function DashboardPage({ user, onLogout }) {
   function selectTab(id) {
     setActiveTab(id);
     setSidebarOpen(false); // close sidebar on mobile after selection
+  }
+
+  // ── Delete handlers ──────────────────────────
+  async function handleDelete(table, row) {
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
+    try {
+      if (table === "employees")      await deleteEmployee(row.emp_no);
+      if (table === "departments")    await deleteDepartment(row.dept_no);
+      if (table === "dept_manager")   await deleteDeptManager(row.emp_no, row.dept_no);
+      if (table === "dept_employees") await deleteDeptEmployee(row.emp_no, row.dept_no);
+      if (table === "salaries")       await deleteSalary(row.emp_no, row.from_date);
+      fetchAll();
+    } catch (e) { alert("Delete failed: " + e.message); }
+  }
+
+  // ── Edit handlers ────────────────────────────
+  function openEdit(table, row) {
+    setEditModal({ table, row });
+    setEditForm({ ...row });
+  }
+
+  function closeEdit() {
+    setEditModal(null);
+    setEditForm({});
+  }
+
+  async function handleUpdate() {
+    try {
+      const { table, row } = editModal;
+      if (table === "employees")   await updateEmployee(row.emp_no, editForm);
+      if (table === "departments") await updateDepartment(row.dept_no, editForm);
+      if (table === "salaries")    await updateSalary(row.emp_no, row.from_date, editForm);
+      closeEdit();
+      fetchAll();
+    } catch (e) { alert("Update failed: " + e.message); }
   }
 
   return (
@@ -103,7 +141,13 @@ export default function DashboardPage({ user, onLogout }) {
                 onSubmit={addEmployee}
                 onSuccess={fetchAll}
               />
-              <RecentRecords rows={records.employees} columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]} />
+              
+              <RecentRecords
+  rows={records.employees}
+  columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
+  onEdit={(row) => openEdit("employees", row)}
+  onDelete={(row) => handleDelete("employees", row)}
+/>
             </Panel>
           )}
 
@@ -117,7 +161,12 @@ export default function DashboardPage({ user, onLogout }) {
                 onSubmit={addDepartment}
                 onSuccess={fetchAll}
               />
-              <RecentRecords rows={records.departments} columns={["dept_no","dept_name"]} />
+              <RecentRecords
+  rows={records.departments}
+  columns={["dept_no","dept_name"]}
+  onEdit={(row) => openEdit("departments", row)}
+  onDelete={(row) => handleDelete("departments", row)}
+/>
             </Panel>
           )}
 
@@ -133,7 +182,11 @@ export default function DashboardPage({ user, onLogout }) {
                 onSubmit={addDeptManager}
                 onSuccess={fetchAll}
               />
-              <RecentRecords rows={records.dept_manager} columns={["emp_no","dept_no","from_date","to_date"]} />
+              <RecentRecords
+  rows={records.dept_manager}
+  columns={["emp_no","dept_no","from_date","to_date"]}
+  onDelete={(row) => handleDelete("dept_manager", row)}
+/>
             </Panel>
           )}
 
@@ -149,7 +202,11 @@ export default function DashboardPage({ user, onLogout }) {
                 onSubmit={addDeptEmployee}
                 onSuccess={fetchAll}
               />
-              <RecentRecords rows={records.dept_employees} columns={["emp_no","dept_no","from_date","to_date"]} />
+               <RecentRecords
+  rows={records.dept_employees}
+  columns={["emp_no","dept_no","from_date","to_date"]}
+  onDelete={(row) => handleDelete("dept_employees", row)}
+/>
             </Panel>
           )}
 
@@ -165,7 +222,12 @@ export default function DashboardPage({ user, onLogout }) {
                 onSubmit={addSalary}
                 onSuccess={fetchAll}
               />
-              <RecentRecords rows={records.salaries} columns={["emp_no","salary","from_date","to_date"]} />
+              <RecentRecords
+  rows={records.salaries}
+  columns={["emp_no","salary","from_date","to_date"]}
+  onEdit={(row) => openEdit("salaries", row)}
+  onDelete={(row) => handleDelete("salaries", row)}
+/>
             </Panel>
           )}
         </main>
@@ -180,6 +242,29 @@ function Panel({ title, sub, children }) {
       <h2 className="panel-title">{title}</h2>
       <p  className="panel-sub">{sub}</p>
       {children}
+
+      {/* ── Edit Modal ── */}
+      {editModal && (
+        <div className="modal-overlay" onClick={closeEdit}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-title">Edit Record</h3>
+            {Object.keys(editForm).map((key) => (
+              <div className="form-group" key={key}>
+                <label className="form-label">{key}</label>
+                <input
+                  className="form-input"
+                  value={editForm[key] ?? ""}
+                  onChange={(e) => setEditForm((f) => ({ ...f, [key]: e.target.value }))}
+                />
+              </div>
+            ))}
+            <div className="modal-actions">
+              <button className="btn-update" onClick={handleUpdate}>💾 Update</button>
+              <button className="btn-cancel" onClick={closeEdit}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -63,3 +63,15 @@ export const getSalaries     = ()  => request("/api/salaries");
 
 // ── Reports ──────────────────────────────────
 export const getSummary = () => request("/api/reports/summary");
+
+// ── Delete ───────────────────────────────────
+export const deleteEmployee     = (id) => request(`/api/employees/${id}`,     "DELETE");
+export const deleteDepartment   = (id) => request(`/api/departments/${id}`,   "DELETE");
+export const deleteDeptManager  = (emp, dept) => request(`/api/dept_manager/${emp}/${dept}`,  "DELETE");
+export const deleteDeptEmployee = (emp, dept) => request(`/api/dept_employees/${emp}/${dept}`,"DELETE");
+export const deleteSalary       = (emp, from) => request(`/api/salaries/${emp}/${from}`,      "DELETE");
+
+// ── Update ───────────────────────────────────
+export const updateEmployee     = (id, d) => request(`/api/employees/${id}`,     "PUT", d);
+export const updateDepartment   = (id, d) => request(`/api/departments/${id}`,   "PUT", d);
+export const updateSalary       = (emp, from, d) => request(`/api/salaries/${emp}/${from}`, "PUT", d);
