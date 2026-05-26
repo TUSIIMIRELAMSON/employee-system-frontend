@@ -23,7 +23,10 @@ const TABS = [
 export default function DashboardPage({ user, onLogout }) {
   const [activeTab, setActiveTab] = useState("reports");
   const [records, setRecords]     = useState({});
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [editModal, setEditModal] = useState(null);
+  const [editForm,  setEditForm]  = useState({});
 
   const [editModal, setEditModal]   = useState(null); // { table, row }
   const [editForm,  setEditForm]    = useState({});
