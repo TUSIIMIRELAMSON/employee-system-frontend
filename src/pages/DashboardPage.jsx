@@ -27,9 +27,28 @@ export default function DashboardPage({ user, onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [editModal, setEditModal] = useState(null);
   const [editForm,  setEditForm]  = useState({});
-
   const [editModal, setEditModal]   = useState(null); // { table, row }
   const [editForm,  setEditForm]    = useState({});
+  const [search, setSearch]       = useState("");
+  const [deptFilter, setDeptFilter] = useState("");
+  const [salaryMin, setSalaryMin]   = useState("");
+  const [salaryMax, setSalaryMax]   = useState("");
+
+// ── Filtered data ────────────────────────────
+const filteredEmployees = (records.employees || []).filter(e => {
+  const matchName = `${e.first_name} ${e.last_name}`.toLowerCase().includes(search.toLowerCase());
+  const matchDept = deptFilter === "" || (records.dept_employees || []).some(
+    de => de.emp_no === e.emp_no && de.dept_no === deptFilter
+  );
+  return matchName && matchDept;
+});
+
+const filteredSalaries = (records.salaries || []).filter(s => {
+  const matchMin = salaryMin === "" || s.salary >= Number(salaryMin);
+  const matchMax = salaryMax === "" || s.salary <= Number(salaryMax);
+  return matchMin && matchMax;
+});
+
 
   const fetchAll = useCallback(async () => {
     const [emp, dep, dm, de, sal] = await Promise.allSettled([
@@ -129,30 +148,51 @@ export default function DashboardPage({ user, onLogout }) {
         <main className="main-content">
           {activeTab === "reports" && <ReportsPage />}
 
-          {activeTab === "employees" && (
-            <Panel title="employees_table" sub="Add a new employee — saved directly to the database">
-              <DataForm
-                fields={[
-                  { key:"emp_no",     label:"emp_no",     pk:true, type:"number", placeholder:"e.g. 10001" },
-                  { key:"birth_date", label:"birth_date",          type:"date" },
-                  { key:"first_name", label:"first_name",          type:"text",   placeholder:"John" },
-                  { key:"last_name",  label:"last_name",           type:"text",   placeholder:"Smith" },
-                  { key:"gender",     label:"gender",              type:"select",
-                    options:[{value:"M",label:"M — Male"},{value:"F",label:"F — Female"}] },
-                  { key:"hire_date",  label:"hire_date",           type:"date" },
-                ]}
-                onSubmit={addEmployee}
-                onSuccess={fetchAll}
-              />
-              
-              <RecentRecords
-  rows={records.employees}
-  columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
-  onEdit={(row) => openEdit("employees", row)}
-  onDelete={(row) => handleDelete("employees", row)}
-/>
-            </Panel>
-          )}
+         {activeTab === "employees" && (
+  <Panel title="employees_table" sub="Add a new employee — saved directly to the database">
+    <DataForm
+      fields={[
+        { key:"emp_no",     label:"emp_no",     pk:true, type:"number", placeholder:"e.g. 10001" },
+        { key:"birth_date", label:"birth_date",          type:"date" },
+        { key:"first_name", label:"first_name",          type:"text",   placeholder:"John" },
+        { key:"last_name",  label:"last_name",           type:"text",   placeholder:"Smith" },
+        { key:"gender",     label:"gender",              type:"select",
+          options:[{value:"M",label:"M — Male"},{value:"F",label:"F — Female"}] },
+        { key:"hire_date",  label:"hire_date",           type:"date" },
+      ]}
+      onSubmit={addEmployee}
+      onSuccess={fetchAll}
+    />
+
+    {/* Search & Filter */}
+    <div className="search-bar">
+      <input
+        className="search-input"
+        placeholder="🔍 Search by name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <select
+        className="filter-select"
+        value={deptFilter}
+        onChange={(e) => setDeptFilter(e.target.value)}
+      >
+        <option value="">All Departments</option>
+        {(records.departments || []).map(d => (
+          <option key={d.dept_no} value={d.dept_no}>{d.dept_name}</option>
+        ))}
+      </select>
+    </div>
+    <p className="search-count">{filteredEmployees.length} employee(s) found</p>
+
+    <RecentRecords
+      rows={filteredEmployees}
+      columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
+      onEdit={(row) => openEdit("employees", row)}
+      onDelete={(row) => handleDelete("employees", row)}
+    />
+  </Panel>
+)}
 
           {activeTab === "departments" && (
             <Panel title="departments" sub="Add a new department">
@@ -213,26 +253,46 @@ export default function DashboardPage({ user, onLogout }) {
             </Panel>
           )}
 
-          {activeTab === "salaries" && (
-            <Panel title="salaries" sub="Add a salary record for an employee">
-              <DataForm
-                fields={[
-                  { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
-                  { key:"salary",    label:"salary",    type:"number", placeholder:"e.g. 75000" },
-                  { key:"from_date", label:"from_date", type:"date" },
-                  { key:"to_date",   label:"to_date",   type:"date" },
-                ]}
-                onSubmit={addSalary}
-                onSuccess={fetchAll}
-              />
-              <RecentRecords
-  rows={records.salaries}
-  columns={["emp_no","salary","from_date","to_date"]}
-  onEdit={(row) => openEdit("salaries", row)}
-  onDelete={(row) => handleDelete("salaries", row)}
-/>
-            </Panel>
-          )}
+  {activeTab === "salaries" && (
+  <Panel title="salaries" sub="Add a salary record for an employee">
+    <DataForm
+      fields={[
+        { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
+        { key:"salary",    label:"salary",    type:"number", placeholder:"e.g. 75000" },
+        { key:"from_date", label:"from_date", type:"date" },
+        { key:"to_date",   label:"to_date",   type:"date" },
+      ]}
+      onSubmit={addSalary}
+      onSuccess={fetchAll}
+    />
+
+    {/* Salary Filter */}
+    <div className="search-bar">
+      <input
+        className="search-input"
+        placeholder="Min salary e.g. 50000"
+        type="number"
+        value={salaryMin}
+        onChange={(e) => setSalaryMin(e.target.value)}
+      />
+      <input
+        className="search-input"
+        placeholder="Max salary e.g. 100000"
+        type="number"
+        value={salaryMax}
+        onChange={(e) => setSalaryMax(e.target.value)}
+      />
+    </div>
+    <p className="search-count">{filteredSalaries.length} record(s) found</p>
+
+    <RecentRecords
+      rows={filteredSalaries}
+      columns={["emp_no","salary","from_date","to_date"]}
+      onEdit={(row) => openEdit("salaries", row)}
+      onDelete={(row) => handleDelete("salaries", row)}
+    />
+  </Panel>
+)}
         </main>
       </div>
     </div>

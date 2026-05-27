@@ -596,3 +596,47 @@ select.form-input option { background: var(--surface); }
   cursor: pointer;
 }
 .btn-cancel:hover { color: var(--text); border-color: var(--muted); }
+
+/* ── Search & Filter ── */
+.search-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.93rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: #44445a; }
+
+.filter-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.93rem;
+  outline: none;
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.search-count {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
