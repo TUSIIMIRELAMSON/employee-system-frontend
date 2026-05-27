@@ -640,3 +640,19 @@ select.form-input option { background: var(--surface); }
   color: var(--muted);
   margin-bottom: 12px;
 }
+
+/* ── Export button ── */
+.btn-export {
+  background: transparent;
+  color: #4ecdc4;
+  border: 1px solid #4ecdc4;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-bottom: 16px;
+}
+.btn-export:hover { background: #4ecdc4; color: #0f0f11; }

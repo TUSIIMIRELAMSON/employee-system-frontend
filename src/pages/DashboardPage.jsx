@@ -102,6 +102,16 @@ export default function DashboardPage({ user, onLogout }) {
     } catch (e) { alert("Update failed: " + e.message); }
   }
 
+  // ── Export to Excel ──────────────────────────
+function exportToExcel(data, filename) {
+  import("xlsx").then(XLSX => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  });
+}
+
   return (
     <div className="shell">
 
@@ -145,13 +155,13 @@ export default function DashboardPage({ user, onLogout }) {
           {activeTab === "reports" && <ReportsPage />}
 
           {activeTab === "employees" && (
-            <Panel title="employees_table" sub="Add a new employee — saved directly to the database">
+            <Panel title="Employees_table" sub="Add a new employee — saved directly to the database">
               <DataForm
                 fields={[
                   { key:"emp_no",     label:"emp_no",     pk:true, type:"number", placeholder:"e.g. 10001" },
                   { key:"birth_date", label:"birth_date",          type:"date" },
-                  { key:"first_name", label:"first_name",          type:"text",   placeholder:"John" },
-                  { key:"last_name",  label:"last_name",           type:"text",   placeholder:"Smith" },
+                  { key:"first_name", label:"first_name",          type:"text",   placeholder:"McLam" },
+                  { key:"last_name",  label:"last_name",           type:"text",   placeholder:"Junior" },
                   { key:"gender",     label:"gender",              type:"select",
                     options:[{value:"M",label:"M — Male"},{value:"F",label:"F — Female"}] },
                   { key:"hire_date",  label:"hire_date",           type:"date" },
@@ -178,6 +188,12 @@ export default function DashboardPage({ user, onLogout }) {
                 </select>
               </div>
               <p className="search-count">{filteredEmployees.length} employee(s) found</p>
+
+              <button className="btn-export" onClick={() => exportToExcel(filteredEmployees, "employees")}>
+                 ⬇️ Download Excel
+              </button>
+
+
               <RecentRecords
                 rows={filteredEmployees}
                 columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
@@ -188,7 +204,10 @@ export default function DashboardPage({ user, onLogout }) {
           )}
 
           {activeTab === "departments" && (
-            <Panel title="departments" sub="Add a new department">
+            <Panel title="Departments" sub="Add a new Department">
+              <button className="btn-export" onClick={() => exportToExcel(records.departments || [], "departments")}>
+                 ⬇️ Download Excel
+              </button>
               <DataForm
                 fields={[
                   { key:"dept_no",   label:"dept_no",   type:"text", placeholder:"e.g. d001" },
@@ -207,7 +226,11 @@ export default function DashboardPage({ user, onLogout }) {
           )}
 
           {activeTab === "dept_manager" && (
-            <Panel title="dept_manager" sub="Assign a manager to a department">
+            <Panel title="Department Managers" sub="Assign a manager to a department">
+              <button className="btn-export" onClick={() => exportToExcel(records.dept_manager || [], "dept_manager")}>
+                 ⬇️ Download Excel
+              </button>
+
               <DataForm
                 fields={[
                   { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
@@ -227,7 +250,11 @@ export default function DashboardPage({ user, onLogout }) {
           )}
 
           {activeTab === "dept_employees" && (
-            <Panel title="dept_employees" sub="Assign an employee to a department">
+            <Panel title="Department Employees" sub="Assign an employee to a department">
+              <button className="btn-export" onClick={() => exportToExcel(records.dept_employees || [], "dept_employees")}>
+                ⬇️ Download Excel
+              </button>
+
               <DataForm
                 fields={[
                   { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
@@ -247,7 +274,7 @@ export default function DashboardPage({ user, onLogout }) {
           )}
 
           {activeTab === "salaries" && (
-            <Panel title="salaries" sub="Add a salary record for an employee">
+            <Panel title="Salaries" sub="Add a salary record for an employee">
               <DataForm
                 fields={[
                   { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
@@ -275,6 +302,9 @@ export default function DashboardPage({ user, onLogout }) {
                 />
               </div>
               <p className="search-count">{filteredSalaries.length} record(s) found</p>
+              <button className="btn-export" onClick={() => exportToExcel(filteredSalaries, "salaries")}>
+                 ⬇️ Download Excel
+              </button>
               <RecentRecords
                 rows={filteredSalaries}
                 columns={["emp_no","salary","from_date","to_date"]}
