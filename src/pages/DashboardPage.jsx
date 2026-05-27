@@ -30,6 +30,7 @@ export default function DashboardPage({ user, onLogout }) {
   const [deptFilter, setDeptFilter]   = useState("");
   const [salaryMin, setSalaryMin]     = useState("");
   const [salaryMax, setSalaryMax]     = useState("");
+  const [profileEmp, setProfileEmp] = useState(null);
 
   const fetchAll = useCallback(async () => {
     const [emp, dep, dm, de, sal] = await Promise.allSettled([
@@ -110,6 +111,31 @@ function exportToExcel(data, filename) {
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
     XLSX.writeFile(wb, `${filename}.xlsx`);
   });
+}
+
+   // ── View Profile ─────────────────────────────
+function openProfile(emp) {
+  setProfileEmp(emp);
+}
+
+function closeProfile() {
+  setProfileEmp(null);
+}
+
+function getEmpDept(emp_no) {
+  const de = (records.dept_employees || []).find(d => d.emp_no === emp_no);
+  if (!de) return "—";
+  const dept = (records.departments || []).find(d => d.dept_no === de.dept_no);
+  return dept ? dept.dept_name : de.dept_no;
+}
+
+function getEmpSalary(emp_no) {
+  const sal = (records.salaries || []).find(s => s.emp_no === emp_no);
+  return sal ? `$${Number(sal.salary).toLocaleString()}` : "—";
+}
+
+function isManager(emp_no) {
+  return (records.dept_manager || []).some(m => m.emp_no === emp_no);
 }
 
   return (
@@ -197,6 +223,7 @@ function exportToExcel(data, filename) {
               <RecentRecords
                 rows={filteredEmployees}
                 columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
+                onView={(row) => openProfile(row)}
                 onEdit={(row) => openEdit("employees", row)}
                 onDelete={(row) => handleDelete("employees", row)}
               />
@@ -314,7 +341,70 @@ function exportToExcel(data, filename) {
             </Panel>
           )}
         </main>
+        {/* ── Profile Modal ── */}
+{profileEmp && (
+  <div className="profile-overlay" onClick={closeProfile}>
+    <div className="profile-box" onClick={(e) => e.stopPropagation()}>
+      <div className="profile-header">
+        <div className="profile-avatar">
+          {profileEmp.gender === "M" ? "👨" : "👩"}
+        </div>
+        <div>
+          <div className="profile-name">{profileEmp.first_name} {profileEmp.last_name}</div>
+          <div className="profile-emp-no">Employee #{profileEmp.emp_no}</div>
+          {isManager(profileEmp.emp_no) && (
+            <span className="profile-badge">Manager</span>
+          )}
+        </div>
       </div>
+
+      <div className="profile-section">
+        <p className="profile-section-title">Personal Info</p>
+        <div className="profile-grid">
+          <div className="profile-item">
+            <div className="profile-item-label">Gender</div>
+            <div className="profile-item-value">{profileEmp.gender === "M" ? "Male" : "Female"}</div>
+          </div>
+          <div className="profile-item">
+            <div className="profile-item-label">Date of Birth</div>
+            <div className="profile-item-value">{profileEmp.birth_date}</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="profile-section">
+        <p className="profile-section-title">Employment Info</p>
+        <div className="profile-grid">
+          <div className="profile-item">
+            <div className="profile-item-label">Hire Date</div>
+            <div className="profile-item-value">{profileEmp.hire_date}</div>
+          </div>
+          <div className="profile-item">
+            <div className="profile-item-label">Department</div>
+            <div className="profile-item-value">{getEmpDept(profileEmp.emp_no)}</div>
+          </div>
+          <div className="profile-item">
+            <div className="profile-item-label">Salary</div>
+            <div className="profile-item-value">{getEmpSalary(profileEmp.emp_no)}</div>
+          </div>
+          <div className="profile-item">
+            <div className="profile-item-label">Role</div>
+            <div className="profile-item-value">{isManager(profileEmp.emp_no) ? "Manager" : "Employee"}</div>
+          </div>
+        </div>
+      </div>
+
+      <button className="btn-cancel" onClick={closeProfile} style={{width:"100%",marginTop:8}}>
+        Close
+      </button>
+    </div>
+  </div>
+)}
+
+      </div>
+
+
+
 
       {/* ── Edit Modal ── */}
       {editModal && (

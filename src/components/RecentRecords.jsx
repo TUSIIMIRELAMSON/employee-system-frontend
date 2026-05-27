@@ -1,9 +1,9 @@
 // src/components/RecentRecords.jsx
-export default function RecentRecords({ rows, columns, onEdit, onDelete }) {
+export default function RecentRecords({ rows, columns, onView, onEdit, onDelete }) {
   if (!rows || rows.length === 0)
     return <p style={{ color:"#888899", fontSize:"0.88rem", marginTop:24 }}>No records yet.</p>;
 
-  const showActions = onEdit || onDelete;
+  const showActions = onView || onEdit || onDelete;
 
   return (
     <div>
@@ -24,6 +24,7 @@ export default function RecentRecords({ rows, columns, onEdit, onDelete }) {
                 ))}
                 {showActions && (
                   <td>
+                    {onView   && <button className="btn-view"   onClick={() => onView(row)}>👁 View</button>}
                     {onEdit   && <button className="btn-edit"   onClick={() => onEdit(row)}>✏️ Edit</button>}
                     {onDelete && <button className="btn-delete" onClick={() => onDelete(row)}>🗑️ Delete</button>}
                   </td>

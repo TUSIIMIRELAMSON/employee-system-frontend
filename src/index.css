@@ -656,3 +656,121 @@ select.form-input option { background: var(--surface); }
   margin-bottom: 16px;
 }
 .btn-export:hover { background: #4ecdc4; color: #0f0f11; }
+
+/* ── Employee Profile ── */
+.profile-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.profile-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(200,242,97,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.profile-emp-no {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.profile-section {
+  margin-bottom: 20px;
+}
+
+.profile-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.profile-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.profile-item-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.profile-item-value {
+  font-size: 0.93rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.profile-badge {
+  display: inline-block;
+  background: rgba(200,242,97,0.15);
+  color: var(--accent);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.btn-view {
+  background: rgba(78,205,196,0.12);
+  color: #4ecdc4;
+  border: 1px solid rgba(78,205,196,0.3);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: background 0.15s;
+}
+.btn-view:hover { background: rgba(78,205,196,0.25); }
