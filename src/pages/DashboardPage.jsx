@@ -39,6 +39,7 @@ export default function DashboardPage({ user, onLogout }) {
   const [dePage,   setDePage]   = useState(1);
   const [salPage,  setSalPage]  = useState(1);
   const [darkMode, setDarkMode] = useState(true);
+  const isAdmin = user?.role === "admin";
   const PER_PAGE = 5;
 
   const fetchAll = useCallback(async () => {
@@ -168,15 +169,25 @@ function toggleTheme() {
         <div className="topbar-left">
           <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
           <span className="topbar-logo">◆</span>
-          <span className="topbar-title">Employee DB</span>
+          <span className="topbar-title">McLAM DATABASE SYSTEM</span>
         </div>
         <div className="topbar-right">
-  <span className="topbar-user">{user.name}</span>
-  <button className="btn-theme" onClick={toggleTheme}>
-    {darkMode ? "☀️" : "🌙"}
-  </button>
-  <button className="btn-signout" onClick={onLogout}>Sign Out</button>
-</div>
+        <span className="topbar-user">
+         {user.name} 
+         <span style={{
+         marginLeft:8, fontSize:"0.7rem", padding:"2px 8px",
+         borderRadius:20, background: user.role === "admin" ? "rgba(200,242,97,0.15)" : "rgba(78,205,196,0.15)",
+         color: user.role === "admin" ? "var(--accent)" : "#4ecdc4",
+         fontWeight:600, textTransform:"uppercase"
+         }}>
+         {user.role || "user"}
+        </span>
+       </span>
+         <button className="btn-theme" onClick={toggleTheme}>
+          {darkMode ? "☀️" : "🌙"}
+         </button>
+        <button className="btn-signout" onClick={onLogout}>Sign Out</button>
+      </div>
       </nav>
 
       <div className="db-body">
@@ -207,6 +218,7 @@ function toggleTheme() {
 
           {activeTab === "employees" && (
             <Panel title="Employees_table" sub="Add a new employee — saved directly to the database">
+              {isAdmin && (
               <DataForm
                 fields={[
                   { key:"emp_no",     label:"emp_no",     pk:true, type:"number", placeholder:"e.g. 10001" },
@@ -220,6 +232,7 @@ function toggleTheme() {
                 onSubmit={addEmployee}
                 onSuccess={fetchAll}
               />
+              )}
               <div className="search-bar">
                 <input
                   className="search-input"
@@ -246,11 +259,11 @@ function toggleTheme() {
 
 
              <RecentRecords
-               rows={pagedEmployees}
-               columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
-               onView={(row) => openProfile(row)}
-               onEdit={(row) => openEdit("employees", row)}
-               onDelete={(row) => handleDelete("employees", row)}
+              rows={pagedEmployees}
+              columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
+              onView={(row) => openProfile(row)}
+              onEdit={isAdmin ? (row) => openEdit("employees", row) : null}
+              onDelete={isAdmin ? (row) => handleDelete("employees", row) : null}
              />
             <Pagination total={filteredEmployees.length} page={empPage} perPage={PER_PAGE} onChange={setEmpPage} />
             </Panel>
@@ -261,6 +274,7 @@ function toggleTheme() {
               <button className="btn-export" onClick={() => exportToExcel(records.departments || [], "departments")}>
                  ⬇️ Download Excel
               </button>
+               {isAdmin && (
               <DataForm
                 fields={[
                   { key:"dept_no",   label:"dept_no",   type:"text", placeholder:"e.g. d001" },
@@ -269,12 +283,13 @@ function toggleTheme() {
                 onSubmit={addDepartment}
                 onSuccess={fetchAll}
               />
-              <RecentRecords
-                rows={pagedDepts}
-                columns={["dept_no","dept_name"]}
-                onEdit={(row) => openEdit("departments", row)}
-                onDelete={(row) => handleDelete("departments", row)}
-              />
+               )}
+             <RecentRecords
+               rows={pagedDepts}
+               columns={["dept_no","dept_name"]}
+               onEdit={isAdmin ? (row) => openEdit("departments", row) : null}
+               onDelete={isAdmin ? (row) => handleDelete("departments", row) : null}
+             />
               <Pagination total={(records.departments||[]).length} page={deptPage} perPage={PER_PAGE} onChange={setDeptPage} />
             </Panel>
           )}
@@ -285,6 +300,7 @@ function toggleTheme() {
                  ⬇️ Download Excel
               </button>
 
+               {isAdmin && (
               <DataForm
                 fields={[
                   { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
@@ -295,10 +311,11 @@ function toggleTheme() {
                 onSubmit={addDeptManager}
                 onSuccess={fetchAll}
               />
+                )}
             <RecentRecords
               rows={pagedDM}
               columns={["emp_no","dept_no","from_date","to_date"]}
-              onDelete={(row) => handleDelete("dept_manager", row)}
+              onDelete={isAdmin ? (row) => handleDelete("dept_manager", row) : null}
             />
             <Pagination total={(records.dept_manager||[]).length} page={dmPage} perPage={PER_PAGE} onChange={setDmPage} />
             </Panel>
@@ -309,7 +326,7 @@ function toggleTheme() {
               <button className="btn-export" onClick={() => exportToExcel(records.dept_employees || [], "dept_employees")}>
                 ⬇️ Download Excel
               </button>
-
+            {isAdmin && (
               <DataForm
                 fields={[
                   { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
@@ -320,17 +337,19 @@ function toggleTheme() {
                 onSubmit={addDeptEmployee}
                 onSuccess={fetchAll}
               />
+            )}
               <RecentRecords
                 rows={pagedDE}
                 columns={["emp_no","dept_no","from_date","to_date"]}
-                onDelete={(row) => handleDelete("dept_employees", row)}
-              />
+                onDelete={isAdmin ? (row) => handleDelete("dept_employees", row) : null}
+               />
               <Pagination total={(records.dept_employees||[]).length} page={dePage} perPage={PER_PAGE} onChange={setDePage} />
             </Panel>
           )}
 
           {activeTab === "salaries" && (
             <Panel title="Salaries" sub="Add a salary record for an employee">
+               {isAdmin && (
               <DataForm
                 fields={[
                   { key:"emp_no",    label:"emp_no",    type:"number", placeholder:"e.g. 10001" },
@@ -341,6 +360,7 @@ function toggleTheme() {
                 onSubmit={addSalary}
                 onSuccess={fetchAll}
               />
+                )}
               <div className="search-bar">
                 <input
                   className="search-input"
@@ -362,10 +382,10 @@ function toggleTheme() {
                  ⬇️ Download Excel
               </button>
               <RecentRecords
-               rows={pagedSalaries}
-               columns={["emp_no","salary","from_date","to_date"]}
-               onEdit={(row) => openEdit("salaries", row)}
-               onDelete={(row) => handleDelete("salaries", row)}
+                rows={pagedSalaries}
+                columns={["emp_no","salary","from_date","to_date"]}
+                onEdit={isAdmin ? (row) => openEdit("salaries", row) : null}
+                onDelete={isAdmin ? (row) => handleDelete("salaries", row) : null}
               />
               <Pagination total={filteredSalaries.length} page={salPage} perPage={PER_PAGE} onChange={setSalPage} />
             </Panel>
@@ -469,4 +489,4 @@ function Panel({ title, sub, children }) {
     </div>
   );
 }
-// updated Wed, May 27, 2026 10:30:00 AM
+
