@@ -774,3 +774,38 @@ select.form-input option { background: var(--surface); }
   transition: background 0.15s;
 }
 .btn-view:hover { background: rgba(78,205,196,0.25); }
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pagination-info {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-page {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 7px;
+  padding: 6px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-page:hover    { border-color: var(--accent); color: var(--accent); }
+.btn-page.active   { background: rgba(200,242,97,0.15); border-color: var(--accent); color: var(--accent); }
+.btn-page:disabled { opacity: 0.4; cursor: not-allowed; }

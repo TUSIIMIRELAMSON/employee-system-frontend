@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from "react";
 import DataForm       from "../components/DataForm";
 import RecentRecords  from "../components/RecentRecords";
 import ReportsPage    from "./ReportsPage";
+import Pagination from "../components/Pagination";
+
 import {
   addEmployee,     getEmployees,    deleteEmployee,    updateEmployee,
   addDepartment,   getDepartments,  deleteDepartment,  updateDepartment,
@@ -31,6 +33,12 @@ export default function DashboardPage({ user, onLogout }) {
   const [salaryMin, setSalaryMin]     = useState("");
   const [salaryMax, setSalaryMax]     = useState("");
   const [profileEmp, setProfileEmp] = useState(null);
+  const [empPage,  setEmpPage]  = useState(1);
+  const [deptPage, setDeptPage] = useState(1);
+  const [dmPage,   setDmPage]   = useState(1);
+  const [dePage,   setDePage]   = useState(1);
+  const [salPage,  setSalPage]  = useState(1);
+  const PER_PAGE = 5;
 
   const fetchAll = useCallback(async () => {
     const [emp, dep, dm, de, sal] = await Promise.allSettled([
@@ -67,6 +75,12 @@ export default function DashboardPage({ user, onLogout }) {
     const matchMax = salaryMax === "" || s.salary <= Number(salaryMax);
     return matchMin && matchMax;
   });
+  // ── Paginated data ───────────────────────────
+   const pagedEmployees = filteredEmployees.slice((empPage-1)*PER_PAGE, empPage*PER_PAGE);
+   const pagedDepts     = (records.departments||[]).slice((deptPage-1)*PER_PAGE, deptPage*PER_PAGE);
+   const pagedDM        = (records.dept_manager||[]).slice((dmPage-1)*PER_PAGE, dmPage*PER_PAGE);
+   const pagedDE        = (records.dept_employees||[]).slice((dePage-1)*PER_PAGE, dePage*PER_PAGE);
+   const pagedSalaries  = filteredSalaries.slice((salPage-1)*PER_PAGE, salPage*PER_PAGE);
 
   // ── Delete handlers ──────────────────────────
   async function handleDelete(table, row) {
@@ -220,13 +234,14 @@ function isManager(emp_no) {
               </button>
 
 
-              <RecentRecords
-                rows={filteredEmployees}
-                columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
-                onView={(row) => openProfile(row)}
-                onEdit={(row) => openEdit("employees", row)}
-                onDelete={(row) => handleDelete("employees", row)}
-              />
+             <RecentRecords
+               rows={pagedEmployees}
+               columns={["emp_no","first_name","last_name","gender","birth_date","hire_date"]}
+               onView={(row) => openProfile(row)}
+               onEdit={(row) => openEdit("employees", row)}
+               onDelete={(row) => handleDelete("employees", row)}
+             />
+            <Pagination total={filteredEmployees.length} page={empPage} perPage={PER_PAGE} onChange={setEmpPage} />
             </Panel>
           )}
 
@@ -244,11 +259,12 @@ function isManager(emp_no) {
                 onSuccess={fetchAll}
               />
               <RecentRecords
-                rows={records.departments}
+                rows={pagedDepts}
                 columns={["dept_no","dept_name"]}
                 onEdit={(row) => openEdit("departments", row)}
                 onDelete={(row) => handleDelete("departments", row)}
               />
+              <Pagination total={(records.departments||[]).length} page={deptPage} perPage={PER_PAGE} onChange={setDeptPage} />
             </Panel>
           )}
 
@@ -268,11 +284,12 @@ function isManager(emp_no) {
                 onSubmit={addDeptManager}
                 onSuccess={fetchAll}
               />
-              <RecentRecords
-                rows={records.dept_manager}
-                columns={["emp_no","dept_no","from_date","to_date"]}
-                onDelete={(row) => handleDelete("dept_manager", row)}
-              />
+            <RecentRecords
+              rows={pagedDM}
+              columns={["emp_no","dept_no","from_date","to_date"]}
+              onDelete={(row) => handleDelete("dept_manager", row)}
+            />
+            <Pagination total={(records.dept_manager||[]).length} page={dmPage} perPage={PER_PAGE} onChange={setDmPage} />
             </Panel>
           )}
 
@@ -293,10 +310,11 @@ function isManager(emp_no) {
                 onSuccess={fetchAll}
               />
               <RecentRecords
-                rows={records.dept_employees}
+                rows={pagedDE}
                 columns={["emp_no","dept_no","from_date","to_date"]}
                 onDelete={(row) => handleDelete("dept_employees", row)}
               />
+              <Pagination total={(records.dept_employees||[]).length} page={dePage} perPage={PER_PAGE} onChange={setDePage} />
             </Panel>
           )}
 
@@ -333,11 +351,12 @@ function isManager(emp_no) {
                  ⬇️ Download Excel
               </button>
               <RecentRecords
-                rows={filteredSalaries}
-                columns={["emp_no","salary","from_date","to_date"]}
-                onEdit={(row) => openEdit("salaries", row)}
-                onDelete={(row) => handleDelete("salaries", row)}
+               rows={pagedSalaries}
+               columns={["emp_no","salary","from_date","to_date"]}
+               onEdit={(row) => openEdit("salaries", row)}
+               onDelete={(row) => handleDelete("salaries", row)}
               />
+              <Pagination total={filteredSalaries.length} page={salPage} perPage={PER_PAGE} onChange={setSalPage} />
             </Panel>
           )}
         </main>
@@ -402,9 +421,6 @@ function isManager(emp_no) {
 )}
 
       </div>
-
-
-
 
       {/* ── Edit Modal ── */}
       {editModal && (
