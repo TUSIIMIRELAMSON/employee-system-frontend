@@ -12,7 +12,7 @@ const tooltipStyle = {
   borderRadius:8, color:"#f0f0f0", fontFamily:"inherit",
 };
 
-export default function ReportsPage() {
+export default function ReportsPage({ user }) {
   const [data, setData]   = useState(null);
   const [error, setError] = useState("");
 
@@ -22,36 +22,39 @@ export default function ReportsPage() {
 
   if (error) return <p style={{color:"#ff6b6b",padding:32}}>{error}</p>;
   if (!data)  return <p style={{color:"#888899",padding:32}}>Loading reports…</p>;
+  const today = new Date().toLocaleDateString("en-US", {
+  weekday: "long", year: "numeric", month: "long", day: "numeric"
+});
 
   const maleCount   = data.gender_split.find(g=>g.gender==="M")?.count || 0;
   const femaleCount = data.gender_split.find(g=>g.gender==="F")?.count || 0;
 
-  return (
-    <div>
-      {/* KPI Cards */}
-      <div className="kpi-row">
-        <div className="kpi-card">
-          <span className="kpi-icon">👤</span>
-          <div className="kpi-value">{data.total_employees}</div>
-          <div className="kpi-label">Employees</div>
+ return (
+  <div>
+    {/* Welcome Card */}
+    <div className="welcome-card">
+      <div className="welcome-left">
+        <h2>Welcome back, {user?.name || "User"} 👋</h2>
+        <p>{today}</p>
+      </div>
+      <div className="welcome-right">
+        <div className="welcome-stat">
+          <span className="welcome-stat-value">{data.total_employees}</span>
+          <span className="welcome-stat-label">Employees</span>
         </div>
-        <div className="kpi-card">
-          <span className="kpi-icon">🏢</span>
-          <div className="kpi-value">{data.total_departments}</div>
-          <div className="kpi-label">Departments</div>
+        <div className="welcome-stat">
+          <span className="welcome-stat-value">{data.total_departments}</span>
+          <span className="welcome-stat-label">Departments</span>
         </div>
-        <div className="kpi-card">
-          <span className="kpi-icon">💰</span>
-          <div className="kpi-value">${Number(data.avg_salary).toLocaleString()}</div>
-          <div className="kpi-label">Avg Salary</div>
-        </div>
-        <div className="kpi-card">
-          <span className="kpi-icon">⚧</span>
-          <div className="kpi-value">{maleCount}/{femaleCount}</div>
-          <div className="kpi-label">M / F</div>
+        <div className="welcome-stat">
+          <span className="welcome-stat-value">${Math.round(data.avg_salary/1000)}k</span>
+          <span className="welcome-stat-label">Avg Salary</span>
         </div>
       </div>
+    </div>
 
+    {/* KPI Cards */}
+    
       {/* Charts Row 1 */}
       <div className="charts-row">
         <div className="chart-card">

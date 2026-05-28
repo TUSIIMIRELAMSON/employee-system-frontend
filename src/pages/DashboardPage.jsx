@@ -192,7 +192,7 @@ function isManager(emp_no) {
 
         {/* ── Main Content ── */}
         <main className="main-content">
-          {activeTab === "reports" && <ReportsPage />}
+          {activeTab === "reports" && <ReportsPage user={user} />}
 
           {activeTab === "employees" && (
             <Panel title="Employees_table" sub="Add a new employee — saved directly to the database">
