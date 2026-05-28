@@ -38,6 +38,7 @@ export default function DashboardPage({ user, onLogout }) {
   const [dmPage,   setDmPage]   = useState(1);
   const [dePage,   setDePage]   = useState(1);
   const [salPage,  setSalPage]  = useState(1);
+  const [darkMode, setDarkMode] = useState(true);
   const PER_PAGE = 5;
 
   const fetchAll = useCallback(async () => {
@@ -152,6 +153,13 @@ function isManager(emp_no) {
   return (records.dept_manager || []).some(m => m.emp_no === emp_no);
 }
 
+// ── Theme toggle ─────────────────────────────
+function toggleTheme() {
+  const newMode = !darkMode;
+  setDarkMode(newMode);
+  document.body.classList.toggle("light", !newMode);
+}
+
   return (
     <div className="shell">
 
@@ -163,9 +171,12 @@ function isManager(emp_no) {
           <span className="topbar-title">Employee DB</span>
         </div>
         <div className="topbar-right">
-          <span className="topbar-user">{user.name}</span>
-          <button className="btn-signout" onClick={onLogout}>Sign Out</button>
-        </div>
+  <span className="topbar-user">{user.name}</span>
+  <button className="btn-theme" onClick={toggleTheme}>
+    {darkMode ? "☀️" : "🌙"}
+  </button>
+  <button className="btn-signout" onClick={onLogout}>Sign Out</button>
+</div>
       </nav>
 
       <div className="db-body">
