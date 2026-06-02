@@ -67,16 +67,19 @@ export default function ChatPage({ user }) {
       handleSend();
     }
   }
-
-   function formatTime(ts) {
+  function formatTime(ts) {
   if (!ts) return "";
   const d = new Date(ts);
   const today = new Date();
   const isToday = d.toDateString() === today.toDateString();
-  const timeStr = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  const timeStr = d.toLocaleTimeString([], {
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+  });
   if (isToday) return timeStr;
   return d.toLocaleDateString([], { month: "short", day: "numeric" }) + "  " + timeStr;
 }
+   
 
   function getInitials(name) {
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
