@@ -68,11 +68,15 @@ export default function ChatPage({ user }) {
     }
   }
 
-  function formatTime(ts) {
-    if (!ts) return "";
-    const d = new Date(ts);
-    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  }
+   function formatTime(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  const today = new Date();
+  const isToday = d.toDateString() === today.toDateString();
+  const timeStr = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  if (isToday) return timeStr;
+  return d.toLocaleDateString([], { month: "short", day: "numeric" }) + "  " + timeStr;
+}
 
   function getInitials(name) {
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
