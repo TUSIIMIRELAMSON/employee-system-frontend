@@ -75,3 +75,7 @@ export const deleteSalary       = (emp, from) => request(`/api/salaries/${emp}/$
 export const updateEmployee     = (id, d) => request(`/api/employees/${id}`,     "PUT", d);
 export const updateDepartment   = (id, d) => request(`/api/departments/${id}`,   "PUT", d);
 export const updateSalary       = (emp, from, d) => request(`/api/salaries/${emp}/${from}`, "PUT", d);
+
+// ── Chat ─────────────────────────────────────
+export const getMessages  = ()  => request("/api/messages");
+export const sendMessage  = (d) => request("/api/messages", "POST", d);

@@ -4,6 +4,7 @@ import DataForm       from "../components/DataForm";
 import RecentRecords  from "../components/RecentRecords";
 import ReportsPage    from "./ReportsPage";
 import Pagination from "../components/Pagination";
+import ChatPage from "./ChatPage";
 
 import {
   addEmployee,     getEmployees,    deleteEmployee,    updateEmployee,
@@ -20,6 +21,7 @@ const TABS = [
   { id:"dept_manager",   icon:"🧑‍💼", label:"Dept Manager"  },
   { id:"dept_employees", icon:"👥", label:"Dept Employees"  },
   { id:"salaries",       icon:"💰", label:"Salaries"        },
+  { id:"chat", icon:"💬", label:"Chat" },
 ];
 
 export default function DashboardPage({ user, onLogout }) {
@@ -389,7 +391,11 @@ function toggleTheme() {
               />
               <Pagination total={filteredSalaries.length} page={salPage} perPage={PER_PAGE} onChange={setSalPage} />
             </Panel>
-          )}
+
+             )}
+
+             {activeTab === "chat" && <ChatPage user={user} />}
+
         </main>
         {/* ── Profile Modal ── */}
 {profileEmp && (
