@@ -24,7 +24,7 @@ const TABS = [
   { id:"chat", icon:"💬", label:"Chat" },
 ];
 
-export default function DashboardPage({ user, onLogout }) {
+export default function DashboardPage({ user, onLogout, company }) {
   const [activeTab, setActiveTab]     = useState("reports");
   const [records, setRecords]         = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -171,7 +171,7 @@ function toggleTheme() {
         <div className="topbar-left">
           <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
           <span className="topbar-logo">◆</span>
-          <span className="topbar-title">McLAM DATABASE SYSTEM</span>
+          <span className="topbar-title">{company?.company_name || "Employee DB"}</span>
         </div>
         <div className="topbar-right">
         <span className="topbar-user">
