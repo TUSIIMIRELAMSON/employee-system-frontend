@@ -14,11 +14,16 @@ export default function ChatPage({ user }) {
   const bottomRef = useRef(null);
   const intervalRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+// Auto-scroll to bottom only when user sends a message
+const shouldScrollRef = useRef(false);
 
+useEffect(() => {
+  if (shouldScrollRef.current) {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    shouldScrollRef.current = false;
+  }
+}, [messages]);
+ 
   // Poll for new messages every 3 seconds when unlocked
   useEffect(() => {
     if (!unlocked) return;
@@ -60,6 +65,7 @@ export default function ChatPage({ user }) {
     try {
       await sendMessage({ content });
       setInput("");
+      shouldScrollRef.current = true;
       await fetchMessages();
     } catch (e) {
       alert("Failed to send: " + e.message);
