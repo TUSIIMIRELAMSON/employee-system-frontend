@@ -75,20 +75,17 @@ export default function ChatPage({ user }) {
     }
   }
 
- function formatTime(ts) {
+function formatTime(ts) {
   if (!ts) return "";
-  // Add Z to tell browser this is UTC
   const utcString = ts.includes("Z") || ts.includes("+") ? ts : ts + "Z";
   const d = new Date(utcString);
-  const today = new Date();
-  const isToday = d.toDateString() === today.toDateString();
-  const timeStr = d.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+  return d.toLocaleString([], {
+    month: "short",
+    day:   "numeric",
+    hour:  "2-digit",
+    minute:"2-digit",
+    second:"2-digit",
   });
-  if (isToday) return timeStr;
-  return d.toLocaleDateString([], { month: "short", day: "numeric" }) + "  " + timeStr;
 }
    
 
