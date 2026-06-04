@@ -28,13 +28,20 @@ export default function ChatPage({ user }) {
   }, [unlocked]);
 
   async function fetchMessages() {
-    try {
-      const data = await getMessages();
-      setMessages(data || []);
-    } catch (e) {
-      console.error("Failed to fetch messages:", e);
+  try {
+    const data = await getMessages();
+    if (data && data.length > 0) {
+      console.log("Raw timestamp from API:", data[data.length-1].created_at);
+      console.log("Parsed as Date:", new Date(data[data.length-1].created_at).toString());
+      console.log("With Z appended:", new Date(data[data.length-1].created_at + "Z").toString());
     }
+    setMessages(data || []);
+  } catch (e) {
+    console.error("Failed to fetch messages:", e);
   }
+}
+
+
 
   function handleCodeSubmit() {
     if (codeInput === SECRET_CODE) {
