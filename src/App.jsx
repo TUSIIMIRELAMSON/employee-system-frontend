@@ -1,5 +1,6 @@
 // src/App.jsx
 import { useState } from "react";
+import CompanyAuth   from "./pages/CompanyAuth";
 import AuthPage      from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 
@@ -10,10 +11,17 @@ link.rel  = "stylesheet";
 document.head.appendChild(link);
 
 export default function App() {
-  const stored = localStorage.getItem("emp_user");
-  const token  = localStorage.getItem("emp_token");
+  const storedCompany = localStorage.getItem("emp_company");
+  const storedUser    = localStorage.getItem("emp_user");
+  const storedToken   = localStorage.getItem("emp_token");
 
-  const [user, setUser] = useState(stored && token ? JSON.parse(stored) : null);
+  const [company, setCompany] = useState(storedCompany ? JSON.parse(storedCompany) : null);
+  const [user,    setUser]    = useState(storedUser && storedToken ? JSON.parse(storedUser) : null);
+
+  function handleCompanyVerified(c) {
+    localStorage.setItem("emp_company", JSON.stringify(c));
+    setCompany(c);
+  }
 
   function handleLogin(u) {
     setUser(u);
@@ -25,6 +33,12 @@ export default function App() {
     setUser(null);
   }
 
-  if (!user) return <AuthPage onLogin={handleLogin} />;
-  return <DashboardPage user={user} onLogout={handleLogout} />;
+  // Step 1: Company must sign in first
+  if (!company) return <CompanyAuth onCompanyVerified={handleCompanyVerified} />;
+
+  // Step 2: User must sign in
+  if (!user) return <AuthPage onLogin={handleLogin} company={company} />;
+
+  // Step 3: Dashboard
+  return <DashboardPage user={user} onLogout={handleLogout} company={company} />;
 }
