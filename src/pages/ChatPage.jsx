@@ -74,18 +74,17 @@ export default function ChatPage({ user }) {
       handleSend();
     }
   }
-
 function formatTime(ts) {
   if (!ts) return "";
   const utcString = ts.includes("Z") || ts.includes("+") ? ts : ts + "Z";
   const d = new Date(utcString);
-  return d.toLocaleString([], {
-    month: "short",
-    day:   "numeric",
-    hour:  "2-digit",
-    minute:"2-digit",
-    second:"2-digit",
-  });
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const month  = months[d.getMonth()];
+  const day    = d.getDate();
+  const hours  = String(d.getHours()).padStart(2, "0");
+  const mins   = String(d.getMinutes()).padStart(2, "0");
+  const secs   = String(d.getSeconds()).padStart(2, "0");
+  return `${month} ${day}, ${hours}:${mins}:${secs}`;
 }
    
 
