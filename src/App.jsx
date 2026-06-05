@@ -10,6 +10,12 @@ link.href = "https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM
 link.rel  = "stylesheet";
 document.head.appendChild(link);
 
+// Handle public onboarding route
+if (window.location.pathname.startsWith("/onboarding/")) {
+  const OnboardingForm = require("./pages/OnboardingForm").default;
+  return <OnboardingForm />;
+}
+
 export default function App() {
   const storedCompany = localStorage.getItem("emp_company");
   const storedUser    = localStorage.getItem("emp_user");

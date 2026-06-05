@@ -1,3 +1,9 @@
+import QRPage          from "./QRPage";
+import SubmissionsPage from "./SubmissionsPage";
+import { generateOnboardingLink, getSubmissionsCount } from "../api/api";
+
+
+
 // src/pages/DashboardPage.jsx
 
 import WizardPage     from "./WizardPage";
@@ -29,6 +35,8 @@ const TABS = [
   { id:"salaries",       icon:"💰", label:"Salaries"        },
   { id:"approvals",      icon:"✅", label:"Approvals"       },
   { id:"chat", icon:"💬", label:"Chat" },
+  { id:"qr",          icon:"📲", label:"QR Onboarding" },
+  { id:"submissions", icon:"📥", label:"Submissions"    },
 ];
 
 export default function DashboardPage({ user, onLogout, company }) {
@@ -49,6 +57,7 @@ export default function DashboardPage({ user, onLogout, company }) {
   const [salPage,  setSalPage]  = useState(1);
   const [darkMode, setDarkMode] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+  const [submissionsCount, setSubmissionsCount] = useState(0);
   const isAdmin = user?.role === "admin";
   const PER_PAGE = 5;
 
@@ -69,6 +78,7 @@ export default function DashboardPage({ user, onLogout, company }) {
   useEffect(() => { fetchAll(); }, [fetchAll]);
   useEffect(() => {
     getPendingCount().then(d => setPendingCount(d?.count || 0)).catch(() => {});
+    getSubmissionsCount().then(d => setSubmissionsCount(d?.count || 0)).catch(() => {});
   }, []);
 
   function selectTab(id) {
@@ -226,6 +236,10 @@ function toggleTheme() {
             {t.id === "approvals" && pendingCount > 0 && (
              <span className="notif-badge">{pendingCount}</span>
           )}
+          {t.id === "submissions" && submissionsCount > 0 && (
+          <span className="notif-badge">{submissionsCount}</span>
+         )}
+
            </button>
        ))}
 
@@ -253,6 +267,19 @@ function toggleTheme() {
     />
   </Panel>
 )}
+
+{activeTab === "qr" && <QRPage company={company} />}
+
+{activeTab === "submissions" && (
+  <SubmissionsPage
+    onRefresh={() => {
+      fetchAll();
+      getSubmissionsCount().then(d => setSubmissionsCount(d?.count || 0)).catch(() => {});
+    }}
+  />
+)}
+
+
 
 {activeTab === "approvals" && (
   <ApprovalsPage

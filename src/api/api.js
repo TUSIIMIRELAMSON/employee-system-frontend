@@ -99,3 +99,9 @@ export const getApprovals     = ()  => request("/api/approvals");
 export const getPendingCount  = ()  => request("/api/approvals/pending/count");
 export const approveManager   = (id) => request(`/api/approvals/${id}/approve`, "POST");
 export const rejectManager    = (id) => request(`/api/approvals/${id}/reject`,  "POST");
+
+// ── Onboarding / QR ──────────────────────────
+export const generateOnboardingLink = () => request("/api/onboarding/generate", "POST");
+export const getSubmissions         = ()  => request("/api/submissions");
+export const getSubmissionsCount    = ()  => request("/api/submissions/count");
+export const completeFromSubmission = (token, d) => request(`/api/onboarding/wizard/${token}`, "POST", d);
