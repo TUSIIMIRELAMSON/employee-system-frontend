@@ -47,4 +47,4 @@ export default function App() {
 
   // Step 3: Dashboard
   return <DashboardPage user={user} onLogout={handleLogout} company={company} />;
-}
+}// v2
