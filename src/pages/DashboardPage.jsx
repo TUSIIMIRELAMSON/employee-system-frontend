@@ -1,4 +1,9 @@
 // src/pages/DashboardPage.jsx
+
+import WizardPage     from "./WizardPage";
+import ApprovalsPage  from "./ApprovalsPage";
+import { getPendingCount } from "../api/api";
+
 import { useState, useEffect, useCallback } from "react";
 import DataForm       from "../components/DataForm";
 import RecentRecords  from "../components/RecentRecords";
@@ -16,11 +21,13 @@ import {
 
 const TABS = [
   { id:"reports",        icon:"📊", label:"Reports"        },
+  { id:"wizard",         icon:"🧙", label:"Add Employee"    },
   { id:"employees",      icon:"👤", label:"Employees"       },
   { id:"departments",    icon:"🏢", label:"Departments"     },
   { id:"dept_manager",   icon:"🧑‍💼", label:"Dept Manager"  },
   { id:"dept_employees", icon:"👥", label:"Dept Employees"  },
   { id:"salaries",       icon:"💰", label:"Salaries"        },
+  { id:"approvals",      icon:"✅", label:"Approvals"       },
   { id:"chat", icon:"💬", label:"Chat" },
 ];
 
@@ -41,6 +48,7 @@ export default function DashboardPage({ user, onLogout, company }) {
   const [dePage,   setDePage]   = useState(1);
   const [salPage,  setSalPage]  = useState(1);
   const [darkMode, setDarkMode] = useState(true);
+  const [pendingCount, setPendingCount] = useState(0);
   const isAdmin = user?.role === "admin";
   const PER_PAGE = 5;
 
@@ -59,6 +67,9 @@ export default function DashboardPage({ user, onLogout, company }) {
   }, []);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    getPendingCount().then(d => setPendingCount(d?.count || 0)).catch(() => {});
+  }, []);
 
   function selectTab(id) {
     setActiveTab(id);
@@ -203,20 +214,54 @@ function toggleTheme() {
         {/* ── Sidebar ── */}
         <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
           <p className="sidebar-label">Navigation</p>
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              className={`tab-btn ${activeTab === t.id ? "active" : ""}`}
-              onClick={() => selectTab(t.id)}
-            >
-              <span>{t.icon}</span> {t.label}
-            </button>
-          ))}
+
+         {TABS.map((t) => (
+           <button
+             key={t.id}
+             className={`tab-btn ${activeTab === t.id ? "active" : ""}`}
+             onClick={() => selectTab(t.id)}
+           >
+      
+            <span>{t.icon}</span> {t.label}
+            {t.id === "approvals" && pendingCount > 0 && (
+             <span className="notif-badge">{pendingCount}</span>
+          )}
+           </button>
+       ))}
+
         </aside>
 
         {/* ── Main Content ── */}
         <main className="main-content">
           {activeTab === "reports" && <ReportsPage user={user} />}
+
+          {activeTab === "wizard" && (
+  <Panel title="Add New Employee" sub="Complete employee setup in one flow">
+    <WizardPage
+      departments={records.departments || []}
+      onSuccess={(result) => {
+        fetchAll();
+        getPendingCount().then(d => setPendingCount(d?.count || 0)).catch(() => {});
+        if (result?.is_manager) {
+          alert("✅ Employee saved! Manager role is pending admin approval.");
+        } else {
+          alert("✅ Employee saved successfully!");
+        }
+        selectTab("employees");
+      }}
+      onClose={() => selectTab("employees")}
+    />
+  </Panel>
+)}
+
+{activeTab === "approvals" && (
+  <ApprovalsPage
+    isAdmin={isAdmin}
+    onApprovalChange={() => {
+      getPendingCount().then(d => setPendingCount(d?.count || 0)).catch(() => {});
+    }}
+  />
+)}
 
           {activeTab === "employees" && (
             <Panel title="Employees_table" sub="Add a new employee — saved directly to the database">

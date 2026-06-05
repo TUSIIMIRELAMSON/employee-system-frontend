@@ -90,3 +90,12 @@ export const getSummary = () => request("/api/reports/summary");
 // ── Chat ─────────────────────────────────────
 export const getMessages = ()  => request("/api/messages");
 export const sendMessage = (d) => request("/api/messages", "POST", d);
+
+// ── Wizard ───────────────────────────────────
+export const employeeWizard  = (d) => request("/api/employees/wizard", "POST", d);
+
+// ── Approvals ────────────────────────────────
+export const getApprovals     = ()  => request("/api/approvals");
+export const getPendingCount  = ()  => request("/api/approvals/pending/count");
+export const approveManager   = (id) => request(`/api/approvals/${id}/approve`, "POST");
+export const rejectManager    = (id) => request(`/api/approvals/${id}/reject`,  "POST");
