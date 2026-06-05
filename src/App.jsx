@@ -3,18 +3,13 @@ import { useState } from "react";
 import CompanyAuth   from "./pages/CompanyAuth";
 import AuthPage      from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
+import OnboardingForm from "./pages/OnboardingForm";
 
 // Load Google Fonts
 const link = document.createElement("link");
 link.href = "https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap";
 link.rel  = "stylesheet";
 document.head.appendChild(link);
-
-// Handle public onboarding route
-if (window.location.pathname.startsWith("/onboarding/")) {
-  const OnboardingForm = require("./pages/OnboardingForm").default;
-  return <OnboardingForm />;
-}
 
 export default function App() {
   const storedCompany = localStorage.getItem("emp_company");
@@ -23,6 +18,11 @@ export default function App() {
 
   const [company, setCompany] = useState(storedCompany ? JSON.parse(storedCompany) : null);
   const [user,    setUser]    = useState(storedUser && storedToken ? JSON.parse(storedUser) : null);
+
+  // Handle public onboarding route — no login needed
+  if (window.location.pathname.startsWith("/onboarding/")) {
+    return <OnboardingForm />;
+  }
 
   function handleCompanyVerified(c) {
     localStorage.setItem("emp_company", JSON.stringify(c));
