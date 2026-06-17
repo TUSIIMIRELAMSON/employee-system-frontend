@@ -47,7 +47,7 @@ export default function LandingPage({ onGetStarted }) {
           borderRadius: 20, padding: "6px 18px", fontSize: "0.82rem",
           marginBottom: 24, color: "#93C5FD", fontWeight: 600, letterSpacing: "0.05em",
         }}>
-          EMPLOYEE DATABASE MANAGEMENT SYSTEM
+          McLAM EMPLOYEE DATABASE MANAGEMENT SYSTEM
         </div>
 
         <h1 style={{
@@ -64,8 +64,8 @@ export default function LandingPage({ onGetStarted }) {
           fontSize: "1.1rem", color: "#BFDBFE", maxWidth: 560,
           margin: "0 auto 40px", lineHeight: 1.7,
         }}>
-          A complete HR system for modern businesses. Register employees, track departments,
-          manage salaries, and generate live reports — all in one place.
+          A complete System for modern businesses. Register employees, track departments,
+          manage salaries, and generate live reports — All in one place.
         </p>
 
         <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -74,7 +74,7 @@ export default function LandingPage({ onGetStarted }) {
             borderRadius: 10, padding: "14px 32px", fontSize: "1rem",
             fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
           }}>
-            Start for Free →
+            Start for Free
           </button>
           <button onClick={onGetStarted} style={{
             background: "transparent", color: "#FFFFFF",
