@@ -55,7 +55,7 @@ export default function DashboardPage({ user, onLogout, company }) {
   const [dmPage,   setDmPage]   = useState(1);
   const [dePage,   setDePage]   = useState(1);
   const [salPage,  setSalPage]  = useState(1);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [submissionsCount, setSubmissionsCount] = useState(0);
   const isAdmin = user?.role === "admin";
@@ -181,7 +181,7 @@ function isManager(emp_no) {
 function toggleTheme() {
   const newMode = !darkMode;
   setDarkMode(newMode);
-  document.body.classList.toggle("light", !newMode);
+  document.body.classList.toggle("dark", newMode);
 }
 
   return (
@@ -207,9 +207,9 @@ function toggleTheme() {
         </span>
        </span>
          <button className="btn-theme" onClick={toggleTheme}>
-          {darkMode ? "☀️" : "🌙"}
+           {darkMode ? "☀️" : "🌙"}
          </button>
-        <button className="btn-signout" onClick={onLogout}>Sign Out</button>
+       <button className="btn-signout" onClick={onLogout}>Sign Out</button>
       </div>
       </nav>
 
