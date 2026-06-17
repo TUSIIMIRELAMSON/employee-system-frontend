@@ -235,7 +235,7 @@ export default function LandingPage({ onGetStarted }) {
           </span>
         </div>
         <p style={{ color: "#64748B", fontSize: "0.82rem", margin: 0 }}>
-          Employee Database Management System · Built with React, Flask & PostgreSQL
+          Employee Database Management System · © 2025 McLAM GROUP. All rights reserved.
         </p>
       </div>
 
