@@ -1,8 +1,9 @@
 // src/App.jsx
 import { useState } from "react";
-import CompanyAuth   from "./pages/CompanyAuth";
-import AuthPage      from "./pages/AuthPage";
-import DashboardPage from "./pages/DashboardPage";
+import LandingPage    from "./pages/LandingPage";
+import CompanyAuth    from "./pages/CompanyAuth";
+import AuthPage       from "./pages/AuthPage";
+import DashboardPage  from "./pages/DashboardPage";
 import OnboardingForm from "./pages/OnboardingForm";
 
 // Load Google Fonts
@@ -16,6 +17,7 @@ export default function App() {
   const storedUser    = localStorage.getItem("emp_user");
   const storedToken   = localStorage.getItem("emp_token");
 
+  const [showLanding, setShowLanding] = useState(!storedCompany);
   const [company, setCompany] = useState(storedCompany ? JSON.parse(storedCompany) : null);
   const [user,    setUser]    = useState(storedUser && storedToken ? JSON.parse(storedUser) : null);
 
@@ -27,6 +29,7 @@ export default function App() {
   function handleCompanyVerified(c) {
     localStorage.setItem("emp_company", JSON.stringify(c));
     setCompany(c);
+    setShowLanding(false);
   }
 
   function handleLogin(u) {
@@ -36,10 +39,18 @@ export default function App() {
   function handleLogout() {
     localStorage.removeItem("emp_token");
     localStorage.removeItem("emp_user");
+    localStorage.removeItem("emp_company");
     setUser(null);
+    setCompany(null);
+    setShowLanding(true);
   }
 
-  // Step 1: Company must sign in first
+  // Step 0: Landing page
+  if (showLanding && !company) {
+    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+  }
+
+  // Step 1: Company must sign in
   if (!company) return <CompanyAuth onCompanyVerified={handleCompanyVerified} />;
 
   // Step 2: User must sign in
@@ -47,4 +58,4 @@ export default function App() {
 
   // Step 3: Dashboard
   return <DashboardPage user={user} onLogout={handleLogout} company={company} />;
-}// v2
+}
