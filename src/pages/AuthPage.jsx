@@ -8,6 +8,7 @@ export default function AuthPage({ onLogin, company }) {
   const [error, setError]     = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -34,6 +35,7 @@ export default function AuthPage({ onLogin, company }) {
       } else {
         if (!form.email || !form.password)
           throw new Error("Please fill in both fields.");
+
         const data = await signin({
           email: form.email,
           password: form.password,
@@ -43,9 +45,15 @@ export default function AuthPage({ onLogin, company }) {
         localStorage.setItem("emp_user",  JSON.stringify(data.user));
         onLogin(data.user);
       }
+
     } catch (e) {
-      setError(e.message);
-    } finally {
+  if (e.message.includes("locked")) {
+    setLocked(true);
+  } else {
+    setLocked(false);
+  }
+  setError(e.message);
+} finally {
       setLoading(false);
     }
   }
@@ -108,7 +116,23 @@ export default function AuthPage({ onLogin, company }) {
           </div>
         )}
 
-        {error   && <p className="msg-error">{error}</p>}
+        {error && (
+  <div style={{
+    background: locked ? "rgba(220,38,38,0.08)" : "transparent",
+    border: locked ? "1px solid rgba(220,38,38,0.3)" : "none",
+    borderRadius: locked ? 8 : 0,
+    padding: locked ? "12px 16px" : 0,
+    marginBottom: 12,
+  }}>
+    {locked && <p style={{ fontSize:"1.2rem", marginBottom:4 }}>🔒</p>}
+    <p className="msg-error">{error}</p>
+    {locked && (
+      <p style={{ fontSize:"0.78rem", color:"#888899", marginTop:4 }}>
+        Contact your admin to unlock your account early.
+      </p>
+    )}
+  </div>
+)}
         {success && <p className="msg-success">{success}</p>}
 
         <button className="btn-primary" onClick={handleSubmit} disabled={loading}>
@@ -117,7 +141,7 @@ export default function AuthPage({ onLogin, company }) {
 
         <p className="switch-text">
           {mode === "signup" ? "Already have an account? " : "Don't have an account? "}
-          <button className="switch-link" onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setError(""); setSuccess(""); }}>
+          <button className="switch-link" onClick={() => { setMode(mode === "signup" ? "signin" : "signup"); setError(""); setSuccess(""); setLocked(false); }}>
             {mode === "signup" ? "Sign In" : "Sign Up"}
           </button>
         </p>
