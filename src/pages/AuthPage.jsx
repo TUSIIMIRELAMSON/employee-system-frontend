@@ -66,22 +66,22 @@ export default function AuthPage({ onLogin, company }) {
     <div className="auth-page">
       <div className="auth-card">
         {/* Company badge */}
-        <div style={{
-          background: "rgba(200,242,97,0.08)",
-          border: "1px solid rgba(200,242,97,0.2)",
-          borderRadius: 10, padding: "10px 16px", marginBottom: 24,
-          display: "flex", alignItems: "center", gap: 10,
-        }}>
-          <span style={{ fontSize: 20 }}>🏢</span>
-          <div>
-            <p style={{ fontSize: "0.95rem", fontWeight: 600, color: "#f0f0f0", margin: 0 }}>
-              {company.company_name}
-            </p>
-            <p style={{ fontSize: "0.78rem", color: "#888899", margin: 0 }}>
-              {company.registration_number}
-            </p>
-          </div>
-        </div>
+<div style={{
+  background: "var(--bg)",
+  border: "1px solid var(--border)",
+  borderRadius: 10, padding: "10px 16px", marginBottom: 24,
+  display: "flex", alignItems: "center", gap: 10,
+}}>
+  <span style={{ fontSize: 20 }}>🏢</span>
+  <div>
+    <p style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", margin: 0 }}>
+      {company.company_name}
+    </p>
+    <p style={{ fontSize: "0.78rem", color: "var(--muted)", margin: 0 }}>
+      {company.registration_number}
+    </p>
+  </div>
+</div>
 
         <div className="auth-header">
           <span className="auth-logo">●</span>

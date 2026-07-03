@@ -90,6 +90,7 @@ body {
 }
 
 .form-input {
+  placeholder { color: var(--muted); }
   width: 100%;
   background: var(--bg);
   border: 1px solid var(--border);
